@@ -1,8 +1,8 @@
 package db
 
 import (
-	"errors"
 	"fmt"
+	"log"
 
 	"xorm.io/xorm"
 )
@@ -15,11 +15,34 @@ type Database struct {
 // Connect tao ket noi database
 func (s *Database) Connect(driverName string, dataSourceName string) error {
 	engine, err := xorm.NewEngine(driverName, dataSourceName)
-	s.Data = engine
-	if err != nil || engine != nil {
-		fmt.Println("Loi ket noi db.")
-		return errors.New("Loi db")
+	if err != nil {
+		log.Fatal("Loi", err)
+		return err
 	}
-	fmt.Println("Dang ket noi db.")
+	fmt.Println("Dang ket noi db")
+	s.Data = engine
+	return nil
+}
+
+// CreateTable la phuong thuc tao bang User
+func (s *Database) CreateTable() error {
+	err := s.Data.CreateTables(User{})
+	err = s.Data.CreateTables(Point{})
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	fmt.Println("Tao bang user, point thanh cong")
+	return nil
+}
+
+// Sync2 de anh xa bang
+func (s *Database) Sync2() error {
+	err := s.Data.Sync2(new(User))
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	fmt.Println("Anh xa bang thanh cong")
 	return nil
 }

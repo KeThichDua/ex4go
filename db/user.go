@@ -4,13 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"log"
-
-	"xorm.io/xorm"
 )
 
-// UserTable la nguoi dung
-type UserTable struct {
-	ID        string `json:"id"`
+// User la nguoi dung
+type User struct {
+	Id        string `json:"id"`
 	Name      string `json:"name"`
 	Birth     int64  `json:"birth"`
 	Created   int64  `json:"created"`
@@ -19,63 +17,66 @@ type UserTable struct {
 
 // UserGroup nhom nguoi dung
 type UserGroup struct {
-	Counter   int
-	UserTable *UserTable
+	Counter int
+	User    *User
 }
 
-// CreateTable la phuong thuc tao bang User
-func (s *UserTable) CreateTable(data *xorm.Engine) error {
-	err := data.CreateTables(UserTable{})
-	err = data.Sync2(new(UserTable))
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	fmt.Println("Tao bang user thanh cong.")
-	return nil
-}
-
-// Insert de them du lieu user
-func (s *UserTable) Insert(data *xorm.Engine, user UserTable) error {
-	c, err := data.Insert(user)
-	if c == 0 || err != nil {
-		log.Println("Khong the them user")
+// InsertUser de them du lieu user
+func (s *Database) InsertUser(user User) error {
+	c, err := s.Data.Insert(user)
+	if c == 0 {
+		log.Fatal("Khong the them user")
 		return errors.New("Loi insert")
+	}
+	if err != nil {
+		log.Fatal(err)
+		return err
 	}
 	fmt.Println("Them user thanh cong.")
 	return err
 }
 
-// Update de sua du lieu user
-func (s *UserTable) Update(data *xorm.Engine, user UserTable, conditions UserTable) error {
-	c, err := data.Update(user, conditions)
-	if c == 0 || err != nil {
-		log.Println("Khong tim thay user")
+// UpdateUser de sua du lieu user
+func (s *Database) UpdateUser(user User, conditions User) error {
+	c, err := s.Data.Update(user, conditions)
+	if c == 0 {
+		log.Fatal("Khong tim thay user")
 		return errors.New("Khong tim thay user")
+	}
+	if err != nil {
+		log.Fatal(err)
+		return err
 	}
 	fmt.Println("Cap nhat user thanh cong.")
 	return err
 }
 
-// Find de tim user theo so luong mong muon
-func (s *UserTable) Find(data *xorm.Engine, id string, amount int) ([]*UserTable, error) {
-	var users []*UserTable
-	err := data.Where("i_d = ?", id).Limit(amount, 0).Find(&users)
-	if err != nil || len(users) == 0 {
-		log.Println("Khong tim thay user")
+// FindUser tim kiem 1 user
+func (s *Database) FindUser(id string) (*User, error) {
+	user := &User{Id: id}
+	c, err := s.Data.Get(user)
+	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
-	fmt.Println("Da tim thay user voi id = ", id)
-	return users, nil
+	if !c {
+		log.Println("Khong tim thay user voi id: ", id)
+		return nil, errors.New("Khong tim thay")
+	}
+	return user, nil
 }
 
-// List de liet ke tat ca user
-func (s *UserTable) List(data *xorm.Engine) ([]*UserTable, error) {
-	var users []*UserTable
-	err := data.Find(&users)
-	if err != nil || len(users) == 0 {
-		log.Println("Loi ko tim thay user.")
+// ListUser de liet ke tat ca user
+func (s *Database) ListUser() ([]*User, error) {
+	var users []*User
+	err := s.Data.Desc("id").Find(&users)
+	if err != nil {
+		log.Println(err)
 		return nil, err
+	}
+	if len(users) == 0 {
+		log.Println("Loi ko tim thay user")
+		return nil, errors.New("Database rong")
 	}
 	fmt.Println("Lay ve tat ca user thanh cong.")
 	return users, nil
