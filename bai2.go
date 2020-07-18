@@ -9,16 +9,21 @@ import (
 )
 
 // Bai2 gom yeu cau b2
-func Bai2(d db.Database, err error) {
+func Bai2() {
 	// tạo 1 transaction khi update birth thành công thì cộng 10 điểm vào point sau đó
 	// sửa lại name thành $name + "updated " nếu 1 quá trình fail thì rollback, xong commit (CreateSesson)
 	fmt.Println("\n Bai 2")
-	err = Transaction(d, err)
+	err = d.Connect("mysql", "root:1@tcp(0.0.0.0:3306)/test")
+	defer d.Data.Close()
+
+	id := "temp"
+	some := int64(10)
+	err = Transaction(id, some)
 	fmt.Println(err)
 }
 
 // Transaction thuc hien yeu cau
-func Transaction(d db.Database, err error) error {
+func Transaction(id string, some int64) error {
 	session := d.Data.NewSession()
 	defer session.Close()
 
@@ -30,7 +35,7 @@ func Transaction(d db.Database, err error) error {
 
 	// update birth
 	user := db.User{Birth: time.Now().Unix()}
-	c, err := session.Where("id = ?", "temp").Update(&user)
+	c, err := session.Update(&user, db.User{Id: id})
 	if err != nil {
 		session.Rollback()
 		return err
@@ -40,7 +45,7 @@ func Transaction(d db.Database, err error) error {
 	}
 
 	// cong 10 diem
-	point := db.Point{UserId: "temp"}
+	point := db.Point{UserId: id}
 	c1, err := session.Get(&point)
 	if err != nil {
 		session.Rollback()
@@ -49,8 +54,8 @@ func Transaction(d db.Database, err error) error {
 		session.Rollback()
 		return errors.New("Khong tim thay point")
 	}
-	point.Points = point.Points + 10
-	c, err = session.Where("user_id = ?", "temp").Update(&point)
+	point.Points = point.Points + some
+	c, err = session.Update(&point, db.Point{UserId: id})
 	if err != nil {
 		session.Rollback()
 		return err
@@ -60,7 +65,7 @@ func Transaction(d db.Database, err error) error {
 	}
 
 	// sua name thanh name + "updated"
-	user = db.User{Id: "temp"}
+	user = db.User{Id: id}
 	if has, err := session.Get(&user); err != nil {
 		session.Rollback()
 		return err
@@ -69,7 +74,7 @@ func Transaction(d db.Database, err error) error {
 		return errors.New("Khong tim thay user")
 	}
 	user.Name = user.Name + "updated"
-	if c, err = session.Where("id = ?", user.Id).Update(&user); err != nil {
+	if c, err = session.Update(&user, db.User{Id: id}); err != nil {
 		session.Rollback()
 		return err
 	} else if c == 0 {

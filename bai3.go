@@ -11,10 +11,13 @@ import (
 )
 
 // Bai3 gom yeu cau b3
-func Bai3(d db.Database, err error) {
+func Bai3() {
 	// b3: insert 100 bản ghi vào user: sau đó viết 1 workerpool scantableuser lấy ra tên của các user in
 	// ra màn hình (Dùng scan theo row) dùng 2 worker và thiết lập bộ đếm ${counter} - ${id} - ${name}
 	fmt.Println("\n	Bai 3")
+	err = d.Connect("mysql", "root:1@tcp(0.0.0.0:3306)/test")
+	defer d.Data.Close()
+
 	for i := 0; i < 100; i++ {
 		// insert user
 		temp := time.Now().UnixNano()

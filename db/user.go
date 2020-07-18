@@ -25,11 +25,11 @@ type UserGroup struct {
 func (s *Database) InsertUser(user User) error {
 	c, err := s.Data.Insert(user)
 	if c == 0 {
-		log.Fatal("Khong the them user")
+		log.Println("Khong the them user")
 		return errors.New("Loi insert")
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return err
 	}
 	fmt.Println("Them user thanh cong.")
@@ -40,11 +40,11 @@ func (s *Database) InsertUser(user User) error {
 func (s *Database) UpdateUser(user User, conditions User) error {
 	c, err := s.Data.Update(user, conditions)
 	if c == 0 {
-		log.Fatal("Khong tim thay user")
+		log.Println("Khong tim thay user")
 		return errors.New("Khong tim thay user")
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return err
 	}
 	fmt.Println("Cap nhat user thanh cong.")

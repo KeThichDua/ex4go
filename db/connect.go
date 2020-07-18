@@ -16,10 +16,10 @@ type Database struct {
 func (s *Database) Connect(driverName string, dataSourceName string) error {
 	engine, err := xorm.NewEngine(driverName, dataSourceName)
 	if err != nil {
-		log.Fatal("Loi", err)
+		log.Println("Loi", err)
 		return err
 	}
-	fmt.Println("Dang ket noi db")
+	fmt.Println("Da ket noi db")
 	s.Data = engine
 	return nil
 }
@@ -29,7 +29,7 @@ func (s *Database) CreateTable() error {
 	err := s.Data.CreateTables(User{})
 	err = s.Data.CreateTables(Point{})
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return err
 	}
 	fmt.Println("Tao bang user, point thanh cong")
@@ -40,7 +40,7 @@ func (s *Database) CreateTable() error {
 func (s *Database) Sync2() error {
 	err := s.Data.Sync2(new(User))
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return err
 	}
 	fmt.Println("Anh xa bang thanh cong")

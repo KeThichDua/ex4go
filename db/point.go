@@ -17,11 +17,11 @@ type Point struct {
 func (s *Database) InsertPoint(point Point) error {
 	c, err := s.Data.Insert(point)
 	if c == 0 {
-		log.Fatal("Khong them duoc point")
+		log.Println("Khong them duoc point")
 		return errors.New("Khong them point")
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return err
 	}
 	fmt.Println("Them point thanh cong.")
@@ -32,11 +32,11 @@ func (s *Database) InsertPoint(point Point) error {
 func (s *Database) UpdatePoint(point Point, conditions Point) error {
 	c, err := s.Data.Update(point, conditions)
 	if c == 0 {
-		log.Fatal("Khong sua duoc point")
+		log.Println("Khong sua duoc point")
 		return errors.New("Khong sua point")
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return err
 	}
 	fmt.Println("Cap nhat point thanh cong.")

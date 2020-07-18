@@ -2,14 +2,18 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/KeThichDua/ex4go/db"
 )
 
 // Bai1 gom cac yeu cau b1
-func Bai1(d db.Database, err error) {
+func Bai1() {
 	fmt.Println("\n	Bai 1")
+	err = d.Connect("mysql", "root:1@tcp(0.0.0.0:3306)/test")
+	defer d.Data.Close()
+
 	// anh xa bang
 	err = d.CreateTable()
 	err = d.Sync2()
@@ -42,5 +46,9 @@ func Bai1(d db.Database, err error) {
 		j := arrY[i]
 		point := db.Point{UserId: j.Id, Points: 10, MaxPoints: 100}
 		err = d.InsertPoint(point)
+	}
+
+	if err != nil {
+		log.Println(err)
 	}
 }
